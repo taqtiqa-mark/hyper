@@ -128,6 +128,7 @@ layers = [
     "reqwest",
     "tracing",
     "tracing-core",
+    "tracing-futures",
     "tracing-log",
     "tracing-opentelemetry",
     "tracing-subscriber",

@@ -19,13 +19,11 @@
 
 use hyper::body::Buf;
 use hyper::Client;
-// use hyper::OtelLayer;
 use serde::Deserialize;
 use tracing::info;
+use tracing::instrument::Instrument;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::prelude::*;
-//use tracing_subscriber::Layer;
-//use tracing_subscriber::Registry;
 
 // A simple type alias so as to DRY.
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
@@ -67,32 +65,24 @@ async fn main() -> Result<()> {
         .try_init()
         .expect("Default subscriber");
 
-    //let subscriber = tracing_subscriber::Registry::default().with(telemetry);
+    // Create a span, returning a guard....
+    let root_span = tracing::span!(tracing::Level::INFO, "root_span_echo");
+    async {
 
-    // Trace executed (async) code
-    //tracing::subscriber::with_default(subscriber, || async {
-    // Create a span and enter it, returning a guard....
-    let root_span = tracing::span!(tracing::Level::INFO, "root_span_echo").entered();
+        // Log a `tracing` "event".
+        info!(status = true, answer = 42, message = "first event");
 
-    // We are now inside the span! Like `enter()`, the guard returned by
-    // `entered()` will exit the span when it is dropped...
+        let url = "http://jsonplaceholder.typicode.com/users".parse().unwrap();
+        let users = fetch_json(url).await.expect("Vector of user data");
+        // print users
+        println!("users: {:#?}", users);
 
-    // Log a `tracing` "event".
-    info!(status = true, answer = 42, message = "first event");
-
-    let url = "http://jsonplaceholder.typicode.com/users".parse().unwrap();
-    let users = fetch_json(url).await.expect("Vector of user data");
-    // print users
-    println!("users: {:#?}", users);
-
-    // print the sum of ids
-    let sum = users.iter().fold(0, |acc, user| acc + user.id);
-    println!("sum of ids: {}", sum);
-
-    // ...but, it can also be exited explicitly, returning the `Span`
-    // struct:
-    let _root_span = root_span.exit();
-    //}).await;
+        // print the sum of ids
+        let sum = users.iter().fold(0, |acc, user| acc + user.id);
+        println!("sum of ids: {}", sum);
+    }
+        .instrument(root_span)
+        .await;
     Ok(())
 }
 

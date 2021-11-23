@@ -69,8 +69,8 @@ where
         return Ok(None);
     }
 
-    let span = trace_span!("parse_headers");
-    let _s = span.enter();
+    // let span = trace_span!("parse_headers");
+    // let _s = span.enter();
     T::parse(bytes, ctx)
 }
 
@@ -81,8 +81,8 @@ pub(super) fn encode_headers<T>(
 where
     T: Http1Transaction,
 {
-    let span = trace_span!("encode_headers");
-    let _s = span.enter();
+    // let span = trace_span!("encode_headers");
+    // let _s = span.enter();
     T::encode(enc, dst)
 }
 
