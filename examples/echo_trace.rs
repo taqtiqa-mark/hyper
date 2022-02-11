@@ -2,7 +2,6 @@
 
 use futures_util::TryStreamExt;
 use hyper::service::{make_service_fn, service_fn};
-use hyper::OtelLayer;
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use tracing::info;
 use tracing_subscriber::layer::SubscriberExt;
@@ -82,10 +81,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .build();
 
         // Get new Tracer from TracerProvider
-    let tracer = opentelemetry::trace::TracerProvider::tracer(&provider, "my_app", None);
+    let tracer = opentelemetry::trace::TracerProvider::tracer(&provider, "my_app");
 
     // Create a layer with the configured tracer
-    let telemetry = OtelLayer::new(tracer);
+    let telemetry = tracing_opentelemetry::OpenTelemetryLayer::new(tracer);
 
     // Use tracing subscriber `Registry`, or any other subscriber that `impl LookupSpan`
     tracing_subscriber::registry()

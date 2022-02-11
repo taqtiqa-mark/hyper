@@ -60,17 +60,17 @@ async fn main() -> Result<()> {
 
     // Trace executed (async) code
     // Create a span, returning a guard....
-    let root_span = tracing::span!(tracing::Level::INFO, "root_span_echo");
+    let root_span = tracing::span!(tracing::Level::TRACE, "root_span_echo");
     async {
         // Log a `tracing` "event".
         info!(status = true, answer = 42, message = "first event");
 
         let url = "http://jsonplaceholder.typicode.com/users".parse().unwrap();
         let users = fetch_json(url).await.expect("Vector of user data");
-        // print users
+        // Trace users
         info!("users: {:#?}", users);
 
-        // print the sum of ids
+        // Trace the sum of ids
         let sum = users.iter().fold(0, |acc, user| acc + user.id);
         info!("sum of ids: {}", sum);
     }.instrument(root_span).await;
