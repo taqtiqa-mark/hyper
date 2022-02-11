@@ -8,8 +8,6 @@ use bytes::BytesMut;
 use http::header::ValueIter;
 use http::header::{self, Entry, HeaderName, HeaderValue};
 use http::{HeaderMap, Method, StatusCode, Version};
-#[cfg(feature = "trace")]
-use opentelemetry::trace::SpanKind;
 use tracing::{debug, error, trace, warn};
 
 use crate::body::DecodedLength;
